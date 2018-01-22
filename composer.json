@@ -1,0 +1,16 @@
+{
+  "name": "swissbib/switchSharedAttributesAPIClient",
+  "description": "Client for Switch Edu-ID Shared Attributes API",
+  "authors": [
+    {
+      "name": "Lionel Walter",
+      "email": "lionel.walter@unibas.ch"
+    }
+  ],
+  "autoload": {
+    "psr-0": {
+      "SwitchSharedAttributesAPIClient": "src"
+    }
+  },
+  "license": "GPL-2.0"
+}
