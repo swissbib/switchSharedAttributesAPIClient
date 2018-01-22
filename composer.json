@@ -12,5 +12,10 @@
       "SwitchSharedAttributesAPIClient": "src"
     }
   },
-  "license": "GPL-2.0"
+  "license": "GPL-2.0",
+  "require-dev": {
+    "phing/phing": "2.16.0",
+    "phpunit/phpunit": "5.7.15",
+    "squizlabs/php_codesniffer": "2.8.1"
+  }
 }
