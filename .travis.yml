@@ -7,6 +7,8 @@ php:
 
 before_script:
   - composer install
+  - pear install pear/PHP_CodeSniffer
+  - phpenv rehash
 
 script:
-  - vendor/bin/phing phpunitfast phpcs-console php-cs-fixer-dryrun
+  - phpcs -n --standard=PEAR src
