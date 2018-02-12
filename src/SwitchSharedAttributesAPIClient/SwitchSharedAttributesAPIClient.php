@@ -24,6 +24,10 @@
  */
 namespace SwitchSharedAttributesAPIClient;
 
+use Zend\Http\Client;
+use Zend\Http\Request;
+use Zend\Http\Response;
+
 /**
  * Class SwitchSharedAttributesAPIClient
  *
@@ -36,12 +40,277 @@ namespace SwitchSharedAttributesAPIClient;
 class SwitchSharedAttributesAPIClient
 {
     /**
-     * Small test
+     * Swissbib configuration.
+     *
+     * @var array
+     */
+    protected $configSwitchApi;
+
+    /**
+     * Swissbib configuration.
+     *
+     * @var array
+     */
+    protected $credentials;
+
+    /**
+     * SwitchApi constructor.
+     *
+     * @param $credentials
+     * @param $configSwitchApi
+     */
+    public function __construct($credentials, $configSwitchApi)
+    {
+        $this->credentials   = $credentials;
+        $this->configSwitchApi = $configSwitchApi;
+    }
+
+    /**
+     * Set national-licence-compliant flag to the user.
+     *
+     * @param string $userExternalId External id
      *
      * @return void
+     * @throws \Exception
      */
-    public function helloWorld()
+    public function setNationalCompliantFlag($userExternalId)
     {
-        echo("Hello Better World !");
+        // 1 create a user
+        $internalId = $this->createSwitchUser($userExternalId);
+        // 2 Add user to the National Compliant group
+        $this->addUserToNationalCompliantGroup($internalId);
+        // 3 verify that the user is on the National Compliant group
+        if (!$this->userIsOnNationalCompliantSwitchGroup($userExternalId)) {
+            throw new \Exception(
+                'Was not possible to add user to the ' .
+                'national-licence-compliant group'
+            );
+        }
+    }
+
+    /**
+     * Create a user in the National Licenses registration platform.
+     *
+     * @param string $externalId External id
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function createSwitchUser($externalId)
+    {
+        $client = $this->getBaseClient(Request::METHOD_POST, '/Users');
+        $params = ['externalID' => $externalId];
+        $client->setRawBody(json_encode($params, JSON_UNESCAPED_SLASHES));
+        /**
+         * Response.
+         *
+         * @var Response $response
+         */
+        $response = $client->send();
+        $statusCode = $response->getStatusCode();
+        $body = $response->getBody();
+        if ($statusCode !== 200) {
+            throw new \Exception("Status code: $statusCode result: $body");
+        }
+        $res = json_decode($body);
+
+        return $res->id;
+    }
+
+    /**
+     * Get an instance of the HTTP Client with some basic configuration.
+     *
+     * @param string $method   Method
+     * @param string $relPath  Rel path
+     * @param string $basePath the base path
+     *
+     * @return Client
+     * @throws \Exception
+     */
+    protected function getBaseClient(
+        $method = Request::METHOD_GET,
+        $relPath = '', $basePath = null
+    ) {
+        if (empty($basePath)) {
+            $basePath = $this->configSwitchApi['base_endpoint_url'];
+        }
+        $client = new Client(
+            $basePath . $relPath, [
+                'maxredirects' => 0,
+                'timeout' => 30,
+            ]
+        );
+        //echo $client->getUri();
+        $client->setHeaders(
+            [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ]
+        );
+        $client->setMethod($method);
+        $username = $this->credentials['auth_user'];
+        $passw = $this->credentials['auth_password'];
+        if (empty($username) || empty($passw)) {
+            throw new \Exception(
+                'Was not possible to find the SWITCH API ' .
+                'credentials. Make sure you have correctly configured the ' .
+                '"SWITCH_API_USER" and "SWITCH_API_PASSW" in ' .
+                'config.ini.'
+            );
+
+        }
+        $client->setAuth($username, $passw);
+
+        return $client;
+    }
+
+    /**
+     * Add user to the National Licenses Programme group on the National Licenses
+     * registration platform.
+     *
+     * @param string $userInternalId User internal id
+     *
+     * @return void
+     * @throws \Exception
+     */
+    protected function addUserToNationalCompliantGroup($userInternalId)
+    {
+        $client = $this->getBaseClient(
+            Request::METHOD_PATCH, '/Groups/' .
+            $this->configSwitchApi['national_licence_programme_group_id']
+        );
+        $params = [
+            'schemas' => [
+                $this->configSwitchApi['schema_patch'],
+            ],
+            'Operations' => [
+                [
+                    'op' => $this->configSwitchApi['operation_add'],
+                    'path' => $this->configSwitchApi['path_member'],
+                    'value' => [
+                        [
+                            '$ref' => $this->configSwitchApi['base_endpoint_url'] .
+                                '/Users/' .
+                                $userInternalId,
+                            'value' => $userInternalId,
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        //$str = json_encode($params, JSON_PRETTY_PRINT);
+        //echo "<pre> $str < /pre>";
+        $rawData = json_encode($params, JSON_UNESCAPED_SLASHES);
+        $client->setRawBody($rawData);
+        $response = $client->send();
+        $statusCode = $response->getStatusCode();
+        $body = $response->getBody();
+        if ($statusCode !== 200) {
+            throw new \Exception("Status code: $statusCode result: $body");
+        }
+    }
+
+    /**
+     * Check if the user is on the National Licenses Programme group.
+     *
+     * @param string $userExternalId User external id
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function userIsOnNationalCompliantSwitchGroup($userExternalId)
+    {
+        $internalId = $this->createSwitchUser($userExternalId);
+        $switchUser = $this->getSwitchUserInfo($internalId);
+        foreach ($switchUser->groups as $group) {
+            $v = $this->configSwitchApi['national_licence_programme_group_id'];
+            if ($group->value === $v) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get user info from the National Licenses registration platform.
+     *
+     * @param string $internalId User external id
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function getSwitchUserInfo($internalId)
+    {
+        $client = $this->getBaseClient(Request::METHOD_GET, '/Users/' . $internalId);
+        $response = $client->send();
+        $statusCode = $response->getStatusCode();
+        $body = $response->getBody();
+        if ($statusCode !== 200) {
+            throw new \Exception("Status code: $statusCode result: $body");
+        }
+        $res = json_decode($body);
+
+        return $res;
+    }
+
+    /**
+     * Unset the national compliant flag from the user.
+     *
+     * @param string $userExternalId User external id
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function unsetNationalCompliantFlag($userExternalId)
+    {
+        // 1 create a user
+        $internalId = $this->createSwitchUser($userExternalId);
+        // 2 Add user to the National Compliant group
+        $this->removeUserToNationalCompliantGroup($internalId);
+        // 3 verify that the user is not in the National Compliant group
+        if ($this->userIsOnNationalCompliantSwitchGroup($userExternalId)) {
+            throw new \Exception(
+                'Was not possible to remove the user to the ' .
+                'national-licence-compliant group'
+            );
+        }
+    }
+
+    /**
+     * Remove a national licence user from the national-licence-programme-group.
+     *
+     * @param string $userInternalId User internal id
+     *
+     * @return void
+     * @throws \Exception
+     */
+    protected function removeUserToNationalCompliantGroup($userInternalId)
+    {
+        $client = $this->getBaseClient(
+            Request::METHOD_PATCH,
+            '/Groups/' . $this->configSwitchApi['national_licence_programme_group_id']
+        );
+        $params = [
+            'schemas' => [
+                $this->configSwitchApi['schema_patch'],
+            ],
+            'Operations' => [
+                [
+                    'op' => $this->configSwitchApi['operation_remove'],
+                    'path' => $this->configSwitchApi['path_member'] .
+                        "[value eq \"$userInternalId\"]",
+                ],
+            ],
+        ];
+
+        $rawData = json_encode($params, JSON_UNESCAPED_SLASHES);
+        $client->setRawBody($rawData);
+        $response = $client->send();
+        $statusCode = $response->getStatusCode();
+        $body = $response->getBody();
+        if ($statusCode !== 200) {
+            throw new \Exception("Status code: $statusCode result: $body");
+        }
     }
 }
