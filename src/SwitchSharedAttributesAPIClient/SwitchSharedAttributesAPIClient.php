@@ -42,6 +42,6 @@ class SwitchSharedAttributesAPIClient
      */
     public function helloWorld()
     {
-        echo("Hello World !");
+        echo("Hello Better World !");
     }
 }
