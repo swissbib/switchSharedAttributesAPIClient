@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
+ *
  * @category Swissbib
  * @package  SwitchSharedAttributesAPIClient
  * @author   Lionel Walter <lionel.walter@unibas.ch>
@@ -40,28 +40,28 @@ use Zend\Http\Response;
 class SwitchSharedAttributesAPIClient
 {
     /**
-     * Swissbib configuration.
+     * Switch Api configuration.
      *
-     * @var array
+     * @var array containing host, National Licence group id, ...
      */
     protected $configSwitchApi;
 
     /**
      * Swissbib configuration.
      *
-     * @var array
+     * @var array containing username and password
      */
     protected $credentials;
 
     /**
      * SwitchApi constructor.
      *
-     * @param $credentials
-     * @param $configSwitchApi
+     * @param array $credentials     Credentials
+     * @param array $configSwitchApi Config
      */
     public function __construct($credentials, $configSwitchApi)
     {
-        $this->credentials   = $credentials;
+        $this->credentials = $credentials;
         $this->configSwitchApi = $configSwitchApi;
     }
 
@@ -79,6 +79,31 @@ class SwitchSharedAttributesAPIClient
         $internalId = $this->createSwitchUser($userExternalId);
         // 2 Add user to the National Compliant group
         $this->addUserToNationalCompliantGroup($internalId);
+        // 3 verify that the user is on the National Compliant group
+        if (!$this->userIsOnNationalCompliantSwitchGroup($userExternalId)) {
+            throw new \Exception(
+                'Was not possible to add user to the ' .
+                'national-licence-compliant group'
+            );
+        }
+    }
+
+    /**
+     * Add a Switch edu-ID user to a group, for example to set
+     * common-lib-terms for a given publisher
+     *
+     * @param string $userExternalId EduId number like 169330697816@eduid.ch
+     * @param string $publisherId    The id of the group in Switch API
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function activatePublisherForUser($userExternalId, $publisherId)
+    {
+        // 1 create a user
+        $internalId = $this->createSwitchUser($userExternalId);
+        // 2 Add user to the group
+        $this->addUserToGroup($internalId, $publisherId);
         // 3 verify that the user is on the National Compliant group
         if (!$this->userIsOnNationalCompliantSwitchGroup($userExternalId)) {
             throw new \Exception(
@@ -121,8 +146,8 @@ class SwitchSharedAttributesAPIClient
      * Get an instance of the HTTP Client with some basic configuration.
      *
      * @param string $method   Method
-     * @param string $relPath  Rel path
-     * @param string $basePath the base path
+     * @param string $relPath  Relative path
+     * @param string $basePath The base path
      *
      * @return Client
      * @throws \Exception
@@ -175,9 +200,27 @@ class SwitchSharedAttributesAPIClient
      */
     protected function addUserToNationalCompliantGroup($userInternalId)
     {
+        $this->addUserToGroup(
+            $userInternalId,
+            $this->configSwitchApi['national_licence_programme_group_id']
+        );
+    }
+
+    /**
+     * Add user to the National Licenses Programme group on the National Licenses
+     * registration platform.
+     *
+     * @param string $userInternalId User internal id
+     * @param string $groupId        Group id
+     *
+     * @return void
+     * @throws \Exception
+     */
+    protected function addUserToGroup($userInternalId, $groupId)
+    {
         $client = $this->getBaseClient(
             Request::METHOD_PATCH, '/Groups/' .
-            $this->configSwitchApi['national_licence_programme_group_id']
+            $groupId
         );
         $params = [
             'schemas' => [
@@ -267,7 +310,7 @@ class SwitchSharedAttributesAPIClient
         // 1 create a user
         $internalId = $this->createSwitchUser($userExternalId);
         // 2 Add user to the National Compliant group
-        $this->removeUserToNationalCompliantGroup($internalId);
+        $this->removeUserFromNationalCompliantGroup($internalId);
         // 3 verify that the user is not in the National Compliant group
         if ($this->userIsOnNationalCompliantSwitchGroup($userExternalId)) {
             throw new \Exception(
@@ -285,11 +328,28 @@ class SwitchSharedAttributesAPIClient
      * @return void
      * @throws \Exception
      */
-    protected function removeUserToNationalCompliantGroup($userInternalId)
+    protected function removeUserFromNationalCompliantGroup($userInternalId)
+    {
+        $this->removeUserFromGroup(
+            $userInternalId,
+            $this->configSwitchApi['national_licence_programme_group_id']
+        );
+    }
+
+    /**
+     * Remove a user from a publisher group.
+     *
+     * @param string $userInternalId User internal id
+     * @param string $groupId        Group Id
+     *
+     * @return void
+     * @throws \Exception
+     */
+    protected function removeUserFromGroup($userInternalId, $groupId)
     {
         $client = $this->getBaseClient(
             Request::METHOD_PATCH,
-            '/Groups/' . $this->configSwitchApi['national_licence_programme_group_id']
+            '/Groups/' . $groupId
         );
         $params = [
             'schemas' => [
