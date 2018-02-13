@@ -105,7 +105,7 @@ class SwitchSharedAttributesAPIClient
         // 2 Add user to the group
         $this->addUserToGroup($internalId, $publisherId);
         // 3 verify that the user is on the National Compliant group
-        if (!$this->userIsOnNationalCompliantSwitchGroup($userExternalId)) {
+        if (!$this->userIsOnGroup($userExternalId, $publisherId)) {
             throw new \Exception(
                 'Was not possible to add user to the ' .
                 'national-licence-compliant group'
@@ -263,11 +263,27 @@ class SwitchSharedAttributesAPIClient
      */
     public function userIsOnNationalCompliantSwitchGroup($userExternalId)
     {
+        return $this->userIsOnGroup(
+            $userExternalId,
+            $this->configSwitchApi['national_licence_programme_group_id']
+        );
+    }
+
+    /**
+     * Check if the user is on the group $groupId
+     *
+     * @param string $userExternalId User external id
+     * @param string $groupId        Group Id
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function userIsOnGroup($userExternalId, $groupId)
+    {
         $internalId = $this->createSwitchUser($userExternalId);
         $switchUser = $this->getSwitchUserInfo($internalId);
         foreach ($switchUser->groups as $group) {
-            $v = $this->configSwitchApi['national_licence_programme_group_id'];
-            if ($group->value === $v) {
+            if ($group->value === $groupId) {
                 return true;
             }
         }
@@ -307,15 +323,33 @@ class SwitchSharedAttributesAPIClient
      */
     public function unsetNationalCompliantFlag($userExternalId)
     {
+        $this->removeUserFromGroupAndVerify(
+            $userExternalId,
+            $this->configSwitchApi['national_licence_programme_group_id']
+        );
+    }
+
+    /**
+     * Remove user from group.
+     *
+     * @param string $userExternalId User external id
+     * @param string $groupId        Group id
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function removeUserFromGroupAndVerify($userExternalId, $groupId)
+    {
         // 1 create a user
         $internalId = $this->createSwitchUser($userExternalId);
         // 2 Add user to the National Compliant group
-        $this->removeUserFromNationalCompliantGroup($internalId);
-        // 3 verify that the user is not in the National Compliant group
-        if ($this->userIsOnNationalCompliantSwitchGroup($userExternalId)) {
+        $this->removeUserFromGroup($internalId, $groupId);
+        // 3 verify that the user is not any more in the group
+        if ($this->userIsOnGroup($userExternalId, $groupId)) {
             throw new \Exception(
-                'Was not possible to remove the user to the ' .
-                'national-licence-compliant group'
+                'Was not possible to remove the user' .
+                $userExternalId . 'from the group' .
+                $groupId
             );
         }
     }
