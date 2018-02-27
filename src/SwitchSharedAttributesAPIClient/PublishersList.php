@@ -55,9 +55,11 @@ class PublishersList implements \IteratorAggregate
     /**
      * Load the publishers contracts from a Json Data
      *
-     * @param  string $publishersJsonData publishers contracts in Json
+     * @param string $publishersJsonData publishers contracts in Json
      *
      * @throws \Exception
+     *
+     * @return void
      */
     public function loadPublishersFromJsonFile(string $publishersJsonData)
     {
@@ -72,7 +74,7 @@ class PublishersList implements \IteratorAggregate
             );
         }
 
-        foreach($publishers["publishers"] as $publisherArray) {
+        foreach ($publishers["publishers"] as $publisherArray) {
 
             $publisher = new Publisher();
             $hydrator->hydrate($publisherArray, $publisher);
@@ -94,6 +96,8 @@ class PublishersList implements \IteratorAggregate
      * Add a publisher to the list
      *
      * @param Publisher $publisher The publisher to add
+     *
+     * @return void
      */
     public function addPublisher(Publisher $publisher)
     {
