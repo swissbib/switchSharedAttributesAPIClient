@@ -108,7 +108,7 @@ class SwitchSharedAttributesAPIClient
         if (!$this->userIsOnGroup($userExternalId, $publisherId)) {
             throw new \Exception(
                 'Was not possible to add user to the ' .
-                'national-licence-compliant group'
+                'publisher group ' . $publisherId
             );
         }
     }

@@ -3,7 +3,7 @@
 /**
  * PublishersList
  *
- * PHP version 5
+ * PHP version 7
  *
  * Copyright (C) project swissbib, University Library Basel, Switzerland
  * http://www.swissbib.org  / http://www.swissbib.ch / http://www.ub.unibas.ch
@@ -29,13 +29,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://www.swissbib.org
  */
-
 namespace SwitchSharedAttributesAPIClient;
 
 use Zend\Hydrator\ClassMethods;
-use Zend\Hydrator\HydratorInterface;
 use Zend\Hydrator\NamingStrategy\UnderscoreNamingStrategy;
-use SwitchSharedAttributesAPIClient\Publisher as Publisher;
 
 /**
  * PublishersList
@@ -46,10 +43,22 @@ use SwitchSharedAttributesAPIClient\Publisher as Publisher;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org
  */
-class PublishersList
+class PublishersList implements \IteratorAggregate
 {
+    /**
+     * List of Publishers
+     *
+     * @var array
+     */
     protected $publishers = [];
-    
+
+    /**
+     * Load the publishers contracts from a Json Data
+     *
+     * @param  string $publishersJsonData publishers contracts in Json
+     *
+     * @throws \Exception
+     */
     public function loadPublishersFromJsonFile(string $publishersJsonData)
     {
         $publishers = json_decode($publishersJsonData, true);
@@ -57,19 +66,23 @@ class PublishersList
         $hydrator = new ClassMethods();
         $hydrator->setNamingStrategy(new UnderscoreNamingStrategy());
 
+        if (!isset($publishers['publishers'])) {
+            throw new \Exception(
+                "No valid publishers data supplied."
+            );
+        }
 
         foreach($publishers["publishers"] as $publisherArray) {
 
             $publisher = new Publisher();
             $hydrator->hydrate($publisherArray, $publisher);
-
-            echo $publisher->getName();
-
             array_push($this->publishers, $publisher);
         }
     }
 
     /**
+     * Return an array containing all publishers
+     *
      * @return array
      */
     public function getPublishers(): array
@@ -77,18 +90,32 @@ class PublishersList
         return $this->publishers;
     }
 
+    /**
+     * Add a publisher to the list
+     *
+     * @param Publisher $publisher The publisher to add
+     */
     public function addPublisher(Publisher $publisher)
     {
         array_push($this->publishers, $publisher);
     }
 
+    /**
+     * To allow foreach on PublishersList
+     *
+     * @return \ArrayIterator|\Traversable
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->publishers);
+    }
 
     /**
      * Get the list of publishers which have a contract with this library
      *
      * @param string $libraryCode The library code, for example Z01
      *
-     * @return array  PublishersWithContracts with that library
+     * @return PublishersList Publishers With Contracts with that library
      */
     public function getPublishersForALibrary($libraryCode)
     {
@@ -101,6 +128,11 @@ class PublishersList
         return $publishersWithContracts;
     }
 
+    /**
+     * Number of Publishers in the list
+     *
+     * @return int
+     */
     public function numberOfPublishers()
     {
         return sizeof($this->publishers);
@@ -109,8 +141,8 @@ class PublishersList
     /**
      * Return true if a library has a contract with this publisher
      *
-     * @param string $libraryCode the library code, for example Z01
-     * @param array  $publisher   array of properties for a specific publisher
+     * @param string    $libraryCode The library code, for example Z01
+     * @param Publisher $publisher   The publisher
      *
      * @return bool
      */
@@ -122,7 +154,4 @@ class PublishersList
             return false;
         }
     }
-
-
-
 }

@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @category Swissbib_VuFind2
- * @package  ${PACKAGE}
+ * @package  Swissbib
  * @author   Lionel Walter <lionel.walter@unibas.ch>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://www.swissbib.org
@@ -38,18 +38,33 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org
  */
-
 namespace SwitchSharedAttributesAPIClient;
 
-
-
+/**
+ * PublishersListTest
+ *
+ * @category Swissbib
+ * @package  Swissbib
+ * @author   Lionel Walter <lionel.walter@unibas.ch>
+ * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
+ * @link     http://vufind.org
+ */
 class PublishersListTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * Publishers List
+     *
      * @var PublishersList $publishersList
      */
     protected $publishersList;
 
+    /**
+     * Set Up
+     *
+     * @throws \Exception
+     *
+     * @return void
+     */
     public function setUp()
     {
         $this->publishersList = new PublishersList();
@@ -65,27 +80,56 @@ class PublishersListTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     * Test load Publishers
+     *
+     * @return void
+     */
     public function testLoadPublishersFromJsonFile()
     {
 
-
         $publishers = $this->publishersList->getPublishers();
 
-        $this->assertEquals("Cambridge University Press", $publishers[0]->getName());
-        $this->assertEquals("https://www.cambridge.org/core/journals/", $publishers[0]->getWayflessUrl());
-        $this->assertEquals(["Z01", "RE01001"], $publishers[0]->getLibrariesWithContract());
+        $this->assertEquals(
+            "Cambridge University Press",
+            $publishers[0]->getName()
+        );
+        $this->assertEquals(
+            "https://www.cambridge.org/core/journals/",
+            $publishers[0]->getWayflessUrl()
+        );
+        $this->assertEquals(
+            ["Z01", "RE01001"],
+            $publishers[0]->getLibrariesWithContract()
+        );
     }
 
+    /**
+     * Test get Publishers for a library
+     *
+     * @return void
+     */
     public function testGetPublishersForALibrary()
     {
         /**
+         * Publishers List
+         *
          * @var PublishersList $publishersZ01List
          */
         $publishersZ01List = $this->publishersList->getPublishersForALibrary("Z01");
         $publishersZ01 = $publishersZ01List->getPublishers();
 
-        $this->assertEquals("Cambridge University Press", $publishersZ01[0]->getName());
-        $this->assertEquals("Thieme", $publishersZ01[1]->getName());
-        $this->assertEquals($publishersZ01List->numberOfPublishers(), 2);
+        $this->assertEquals(
+            "Cambridge University Press",
+            $publishersZ01[0]->getName()
+        );
+        $this->assertEquals(
+            "Thieme",
+            $publishersZ01[1]->getName()
+        );
+        $this->assertEquals(
+            $publishersZ01List->numberOfPublishers(),
+            2
+        );
     }
 }

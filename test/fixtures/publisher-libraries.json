@@ -5,7 +5,7 @@
       "url" : "https://www.cambridge.org/core/journals/",
       "wayfless_url" : "https://www.cambridge.org/core/journals/",
       "description" : "a collection of journals",
-      "switch_group_id" : "1d3bcd7b-da70-440d-b777-5bb2d11f1234",
+      "switch_group_id" : "f4d40595-6d7d-41bc-9fa2-7139d2fcf892",
       "libraries_with_contract" : [
         "Z01","RE01001"
       ]
@@ -15,7 +15,7 @@
       "url" : "https://www.munzinger.de",
       "wayfless_url" : "",
       "description" : "a collection of journals",
-      "switch_group_id" : "",
+      "switch_group_id" : "fffff",
       "libraries_with_contract" : [
         "E02"
       ]

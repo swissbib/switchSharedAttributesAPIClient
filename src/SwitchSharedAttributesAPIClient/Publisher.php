@@ -29,7 +29,6 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://www.swissbib.org
  */
-
 namespace SwitchSharedAttributesAPIClient;
 
 /**
@@ -56,7 +55,9 @@ class Publisher
     protected $librariesWithContract;
 
     /**
-     * @return mixed
+     * Get Name
+     *
+     * @return string
      */
     public function getName()
     {
@@ -64,9 +65,11 @@ class Publisher
     }
 
     /**
-     * @param mixed $name
+     * Set Name
      *
-     * @return mixed
+     * @param string $name name
+     *
+     * @return void
      */
     public function setName($name)
     {
@@ -74,7 +77,9 @@ class Publisher
     }
 
     /**
-     * @return mixed
+     * Get url
+     *
+     * @return string
      */
     public function getUrl()
     {
@@ -82,9 +87,11 @@ class Publisher
     }
 
     /**
-     * @param mixed $url
+     * Set Url
      *
-     * @return mixed
+     * @param mixed $url url*
+     *
+     * @return void
      */
     public function setUrl($url)
     {
@@ -92,7 +99,9 @@ class Publisher
     }
 
     /**
-     * @return mixed
+     * Get Wayfless Url
+     *
+     * @return string wayfless url
      */
     public function getWayflessUrl()
     {
@@ -100,9 +109,11 @@ class Publisher
     }
 
     /**
-     * @param mixed $wayflessUrl
+     * Set Wayfless Url
      *
-     * @return mixed
+     * @param string $wayflessUrl wayfless url
+     *
+     * @return void
      */
     public function setWayflessUrl($wayflessUrl)
     {
@@ -110,7 +121,9 @@ class Publisher
     }
 
     /**
-     * @return mixed
+     * Get Description
+     *
+     * @return string
      */
     public function getDescription()
     {
@@ -118,9 +131,11 @@ class Publisher
     }
 
     /**
-     * @param mixed $description
+     * Set Description
      *
-     * @return mixed
+     * @param string $description Description
+     *
+     * @return void
      */
     public function setDescription($description)
     {
@@ -128,7 +143,9 @@ class Publisher
     }
 
     /**
-     * @return mixed
+     * Get Switch Group Id
+     *
+     * @return string
      */
     public function getSwitchGroupId()
     {
@@ -136,9 +153,11 @@ class Publisher
     }
 
     /**
-     * @param mixed $switchGroupId
+     * Set Switch Group Id
      *
-     * @return mixed
+     * @param string $switchGroupId switch group id
+     *
+     * @return void
      */
     public function setSwitchGroupId($switchGroupId)
     {
@@ -146,7 +165,9 @@ class Publisher
     }
 
     /**
-     * @return mixed
+     * Get the libraries which have contracts with this publisher
+     *
+     * @return array the library codes of the libraries
      */
     public function getLibrariesWithContract()
     {
@@ -154,15 +175,14 @@ class Publisher
     }
 
     /**
-     * @param mixed $librariesWithContract
+     * Set Libraries with contract
      *
-     * @return mixed
+     * @param array $librariesWithContract library codes of the libraries
+     *
+     * @return void
      */
     public function setLibrariesWithContract($librariesWithContract)
     {
         $this->librariesWithContract = $librariesWithContract;
     }
-    
-    
-    
 }
