@@ -7,7 +7,9 @@ php:
 before_script:
   - pear install pear/PHP_CodeSniffer
   - phpenv rehash
+  - composer install
 
 script:
   - phpcs -n --standard=PEAR src
+  - pwd
   - ./vendor/bin/phpunit test
