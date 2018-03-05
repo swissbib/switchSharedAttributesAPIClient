@@ -69,9 +69,7 @@ class PublishersListTest extends \PHPUnit_Framework_TestCase
     {
         $this->publishersList = new PublishersList();
 
-        $appDir =  getcwd();
-
-        $filePath = $appDir . '/test/fixtures/publisher-libraries.json';
+        $filePath = __DIR__ . '/fixtures/publisher-libraries.json';
 
         $publishersJsonData
             = file_exists($filePath) ? file_get_contents($filePath) : '';

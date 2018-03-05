@@ -76,9 +76,8 @@ class PuraSwitchClientTest extends \PHPUnit_Framework_TestCase
     {
         $this->publishersList = new PublishersList();
 
-        $appDir =  getcwd();
 
-        $filePath = $appDir . '/test/fixtures/publisher-libraries.json';
+        $filePath = __DIR__ .  '/fixtures/publisher-libraries.json';
 
         $publishersJsonData
             = file_exists($filePath) ? file_get_contents($filePath) : '';
@@ -88,18 +87,19 @@ class PuraSwitchClientTest extends \PHPUnit_Framework_TestCase
         $iniReader = new IniReader();
 
         $configFull = new Config(
-            $iniReader->fromFile($appDir . '/test/fixtures/SwitchApi.ini')
+            $iniReader->fromFile(__DIR__ .  '/fixtures/SwitchApi.ini')
         );
         $configSwitchAPI = $configFull['SwitchApi'];
 
-        $config = new Config(
-            $iniReader->fromFile($appDir . '/test/fixtures/config.ini')
+        $configIni = new Config(
+            $iniReader->fromFile(__DIR__ .  '/fixtures/config.ini')
         );
-        $credentials = $config['SwitchApiCredentials'];
+        $credentials = $configIni['SwitchApiCredentials'];
+
+        $config = array_merge($credentials->toArray(), $configSwitchAPI->toArray());
 
         $this->puraSwitchClient = new PuraSwitchClient(
-            $credentials,
-            $configSwitchAPI,
+            $config,
             $this->publishersList
         );
 

@@ -47,22 +47,58 @@ class SwitchSharedAttributesAPIClient
     protected $configSwitchApi;
 
     /**
-     * Swissbib configuration.
-     *
-     * @var array containing username and password
-     */
-    protected $credentials;
-
-    /**
      * SwitchApi constructor.
      *
-     * @param array $credentials     Credentials
-     * @param array $configSwitchApi Config
+     * @param array $config Configuration (username, password,
+     *                      national_licence_programme_group_id,
+     *                      base_endpoint_url)
+     *
+     * @throws \Exception
      */
-    public function __construct($credentials, $configSwitchApi)
+    public function __construct($config)
     {
-        $this->credentials = $credentials;
-        $this->configSwitchApi = $configSwitchApi;
+        if (isset($config['auth_user'])) {
+            $this->configSwitchApi['auth_user'] = $config['auth_user'];
+        } else {
+            throw new \Exception(
+                'Was not possible to find the SWITCH API ' .
+                'auth_user.'
+            );
+        }
+
+        if (isset($config['auth_password'])) {
+            $this->configSwitchApi['auth_password'] = $config['auth_password'];
+        } else {
+            throw new \Exception(
+                'Was not possible to find the SWITCH API ' .
+                'auth_password.'
+            );
+        }
+
+        if (isset($config['base_endpoint_url'])) {
+            $this->configSwitchApi['base_endpoint_url']
+                = $config['base_endpoint_url'];
+        } else {
+            throw new \Exception(
+                'Was not possible to find the SWITCH API ' .
+                'base_endpoint_url.'
+            );
+        }
+
+        //national_licence_programme_group_id is not mandatory
+        if (isset($config['national_licence_programme_group_id'])) {
+            $this->configSwitchApi['national_licence_programme_group_id']
+                = $config['national_licence_programme_group_id'];
+        }
+
+        $this->configSwitchApi['schema_patch']
+            = 'urn:ietf:params:scim:api:messages:2.0:PatchOp';
+        $this->configSwitchApi['operation_add']
+            = 'add';
+        $this->configSwitchApi['operation_remove']
+            = 'remove';
+        $this->configSwitchApi['path_member']
+            = 'members';
     }
 
     /**
@@ -173,14 +209,12 @@ class SwitchSharedAttributesAPIClient
             ]
         );
         $client->setMethod($method);
-        $username = $this->credentials['auth_user'];
-        $passw = $this->credentials['auth_password'];
+        $username = $this->configSwitchApi['auth_user'];
+        $passw = $this->configSwitchApi['auth_password'];
         if (empty($username) || empty($passw)) {
             throw new \Exception(
                 'Was not possible to find the SWITCH API ' .
-                'credentials. Make sure you have correctly configured the ' .
-                '"SWITCH_API_USER" and "SWITCH_API_PASSW" in ' .
-                'config.ini.'
+                'credentials.'
             );
 
         }

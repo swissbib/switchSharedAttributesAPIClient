@@ -52,13 +52,14 @@ class PuraSwitchClient extends SwitchSharedAttributesAPIClient
     /**
      * PuraSwitchClient constructor.
      *
-     * @param array          $credentials     Credentials
-     * @param array          $configSwitchApi Config
-     * @param PublishersList $publishersList  Publishers List
+     * @param array          $config         Config(username, password, url)
+     * @param PublishersList $publishersList Publishers List
+     *
+     * @throws \Exception
      */
-    public function __construct($credentials, $configSwitchApi, $publishersList)
+    public function __construct($config, $publishersList)
     {
-        parent::__construct($credentials, $configSwitchApi);
+        parent::__construct($config);
         $this->publishersList = $publishersList;
     }
 
