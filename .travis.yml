@@ -1,7 +1,6 @@
 sudo: false
 language: php
 php:
-  - 7.0
   - 7.1
 
 before_script:
@@ -11,5 +10,4 @@ before_script:
 
 script:
   - phpcs -n --standard=PEAR src
-  - pwd
-  - ./vendor/bin/phpunit test
+  - phpunit test
