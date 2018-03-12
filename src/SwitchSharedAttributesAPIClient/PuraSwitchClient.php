@@ -66,7 +66,7 @@ class PuraSwitchClient extends SwitchSharedAttributesAPIClient
     /**
      * Activate all publishers for this user and this library
      *
-     * @param string $userExternalId user external id
+     * @param string $userExternalId EduId number like 169330697816@eduid.ch
      * @param string $libraryCode    library code
      *
      * @return array Success Status and Message
@@ -122,7 +122,7 @@ class PuraSwitchClient extends SwitchSharedAttributesAPIClient
      * also have a contract with the same publisher, we don't deactivate this
      * publisher
      *
-     * @param string $userExternalId User External Id
+     * @param string $userExternalId EduId number like 169330697816@eduid.ch
      * @param string $libraryCode    Library Code
      * @param array  $otherLibraries Other Libraries where the user is registered
      *
@@ -174,9 +174,27 @@ class PuraSwitchClient extends SwitchSharedAttributesAPIClient
             ];
         }
 
+
+        $message = '';
+        if (empty($otherLibraries)) {
+            $publishersDeactivated = [];
+            foreach ($libraryPublisherList as $publisher) {
+                $publishersDeactivated[] = $publisher->getName();
+            }
+
+            $message
+                = 'Publishers deactivated : ' .
+                implode(", ", $publishersDeactivated) .
+                ".";
+        } else {
+            $message = 'This user is also registered with ' .
+                'other pura libraries. Only the publishers ' .
+                'unique to your library have been deactivated.';
+        }
+
         return [
             'success' => 'true',
-            'message' => 'all publishers deactivated',
+            'message' => $message,
         ];
     }
 }
