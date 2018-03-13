@@ -19,3 +19,22 @@ $switchGroupId = 'a4c40594-6d7d-41bc-9fb2-7239d2fcf892';
 //add the user to the group
 $switchApi->activatePublisherForUser($userEduId, $switchGroupId);
 ```
+
+## Installation via composer
+
+Add this to your `composer.json` :
+```json
+{
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "git@github.com:swissbib/switchSharedAttributesAPIClient.git"
+        }
+    ],
+    "require": {
+        "swissbib/switchSharedAttributesAPIClient": "dev-master"
+    }
+}
+```
+
+And do `composer update`.
