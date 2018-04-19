@@ -94,7 +94,7 @@ class PublishersListTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             "https://www.cambridge.org/core/journals/",
-            $publishers[0]->getWayflessUrl()
+            $publishers[0]->getInfoUrl()
         );
         $this->assertEquals(
             ["Z01", "RE01001"],

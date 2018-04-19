@@ -46,7 +46,7 @@ class Publisher
 
     protected $url;
 
-    protected $wayflessUrl;
+    protected $infoUrl;
 
     protected $description;
 
@@ -99,25 +99,25 @@ class Publisher
     }
 
     /**
-     * Get Wayfless Url
+     * Get Info Url
      *
-     * @return string wayfless url
+     * @return string info url
      */
-    public function getWayflessUrl()
+    public function getInfoUrl()
     {
-        return $this->wayflessUrl;
+        return $this->infoUrl;
     }
 
     /**
-     * Set Wayfless Url
+     * Set Info Url
      *
-     * @param string $wayflessUrl wayfless url
+     * @param string $infoUrl info url
      *
      * @return void
      */
-    public function setWayflessUrl($wayflessUrl)
+    public function setInfoUrl($infoUrl)
     {
-        $this->wayflessUrl = $wayflessUrl;
+        $this->infoUrl = $infoUrl;
     }
 
     /**
