@@ -44,6 +44,8 @@ class Publisher
 {
     protected $name;
 
+    protected $shortName;
+
     protected $url;
 
     protected $infoUrl;
@@ -74,6 +76,28 @@ class Publisher
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * Get Short Name
+     *
+     * @return string
+     */
+    public function getShortName()
+    {
+        return $this->shortName;
+    }
+
+    /**
+     * Set Name
+     *
+     * @param string $shortName Short name
+     *
+     * @return void
+     */
+    public function setShortName($shortName)
+    {
+        $this->shortName = $shortName;
     }
 
     /**

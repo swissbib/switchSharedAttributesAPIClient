@@ -21,7 +21,8 @@
       ]
     },
     {
-      "name": "Thieme",
+      "name": "Thieme long title",
+      "short_name": "Thieme",
       "url" : "https://www.thieme.de",
       "info_url" : "",
       "description" : "a collection of journals",

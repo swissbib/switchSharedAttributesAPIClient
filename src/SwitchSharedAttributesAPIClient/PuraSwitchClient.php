@@ -95,14 +95,14 @@ class PuraSwitchClient extends SwitchSharedAttributesAPIClient
             }
         } catch (\Exception $e) {
             return [
-                'success' => 'false',
+                'success' => false,
                 'message' => $e->getMessage(),
             ];
         }
 
         $publishersActivated = [];
         foreach ($libraryPublisherList as $publisher) {
-            $publishersActivated[] = $publisher->getName();
+            $publishersActivated[] = $publisher->getShortName();
         }
 
         $message
@@ -111,7 +111,7 @@ class PuraSwitchClient extends SwitchSharedAttributesAPIClient
             ".";
 
         return [
-            'success' => 'true',
+            'success' => true,
             'message' => $message,
         ];
     }
@@ -155,7 +155,7 @@ class PuraSwitchClient extends SwitchSharedAttributesAPIClient
             }
         } catch (\Exception $e) {
             return [
-                'success' => 'false',
+                'success' => false,
                 'message' => $e->getMessage(),
             ];
         }
@@ -169,7 +169,7 @@ class PuraSwitchClient extends SwitchSharedAttributesAPIClient
             }
         } catch (\Exception $e) {
             return [
-                'success' => 'false',
+                'success' => false,
                 'message' => $e->getMessage(),
             ];
         }
@@ -179,7 +179,11 @@ class PuraSwitchClient extends SwitchSharedAttributesAPIClient
         if (empty($otherLibraries)) {
             $publishersDeactivated = [];
             foreach ($libraryPublisherList as $publisher) {
-                $publishersDeactivated[] = $publisher->getName();
+                if ($publisher->getShortName()) {
+                    $publishersDeactivated[] = $publisher->getShortName();
+                } else {
+                    $publishersDeactivated[] = $publisher->getName();
+                }
             }
 
             $message
@@ -193,7 +197,7 @@ class PuraSwitchClient extends SwitchSharedAttributesAPIClient
         }
 
         return [
-            'success' => 'true',
+            'success' => true,
             'message' => $message,
         ];
     }

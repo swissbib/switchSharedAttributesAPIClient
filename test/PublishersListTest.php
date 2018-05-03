@@ -100,6 +100,10 @@ class PublishersListTest extends \PHPUnit_Framework_TestCase
             ["Z01", "RE01001"],
             $publishers[0]->getLibrariesWithContract()
         );
+        $this->assertEquals(
+            "Thieme",
+            $publishers[2]->getShortName()
+        );
     }
 
     /**
@@ -122,7 +126,7 @@ class PublishersListTest extends \PHPUnit_Framework_TestCase
             $publishersZ01[0]->getName()
         );
         $this->assertEquals(
-            "Thieme",
+            "Thieme long title",
             $publishersZ01[1]->getName()
         );
         $this->assertEquals(
