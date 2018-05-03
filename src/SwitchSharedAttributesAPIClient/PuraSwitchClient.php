@@ -102,7 +102,11 @@ class PuraSwitchClient extends SwitchSharedAttributesAPIClient
 
         $publishersActivated = [];
         foreach ($libraryPublisherList as $publisher) {
-            $publishersActivated[] = $publisher->getShortName();
+            if ($publisher->getShortName()) {
+                $publishersActivated[] = $publisher->getShortName();
+            } else {
+                $publishersActivated[] = $publisher->getName();
+            }
         }
 
         $message
