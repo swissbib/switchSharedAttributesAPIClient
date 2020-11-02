@@ -199,6 +199,8 @@ class SwitchSharedAttributesAPIClient
             $basePath . $relPath, [
                 'maxredirects' => 0,
                 'timeout' => 30,
+                'adapter'   => 'Zend\Http\Client\Adapter\Curl',
+                'curloptions' => array(CURLOPT_FOLLOWLOCATION => true),
             ]
         );
         //echo $client->getUri();
